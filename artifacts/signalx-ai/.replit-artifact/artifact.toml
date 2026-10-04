@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "SignalX AI"
+description = "A real-time crypto market scanner that explains EMA, RSI, MACD, volume, and volatility confirmations across nine Binance markets, with persistent signal history and explicit risk notices."
+version = "1.0.0"
+id = "artifacts/signalx-ai"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 26118
+
+[services.development]
+run = "pnpm --filter @workspace/signalx-ai run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/signalx-ai", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/signalx-ai/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "26118"
+BASE_PATH = "/"

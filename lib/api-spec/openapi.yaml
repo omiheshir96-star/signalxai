@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: signalx
+    description: Crypto market scanning and signal history
 paths:
   /healthz:
     get:
@@ -24,6 +26,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /signalx/state:
+    get:
+      operationId: getSignalxState
+      tags: [signalx]
+      summary: Get scanner status and recent signals
+      description: Returns scanner health, configuration, and persisted real signals.
+      responses:
+        "200":
+          description: Current scanner state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignalxState"
+  /signalx/scan:
+    post:
+      operationId: triggerSignalxScan
+      tags: [signalx]
+      summary: Start a manual market scan
+      description: Starts a real scan of configured Binance markets if one is not already running.
+      responses:
+        "202":
+          description: Scan accepted or already in progress
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignalxScanResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +61,81 @@ components:
           type: string
       required:
         - status
+    SignalxState:
+      type: object
+      properties:
+        state:
+          $ref: "#/components/schemas/ScannerStatus"
+        config:
+          $ref: "#/components/schemas/ScannerConfig"
+        signals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Signal"
+      required: [state, config, signals]
+    ScannerStatus:
+      type: object
+      properties:
+        running:
+          type: boolean
+        scanInProgress:
+          type: boolean
+        lastScan:
+          type: ["string", "null"]
+          format: date-time
+        lastError:
+          type: ["string", "null"]
+      required: [running, scanInProgress, lastScan, lastError]
+    ScannerConfig:
+      type: object
+      properties:
+        minScore:
+          type: integer
+        scanSeconds:
+          type: integer
+        timeframe:
+          type: string
+        symbols:
+          type: array
+          items:
+            type: string
+        telegramConfigured:
+          type: boolean
+      required: [minScore, scanSeconds, timeframe, symbols, telegramConfigured]
+    Signal:
+      type: object
+      properties:
+        id:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        symbol:
+          type: string
+        side:
+          type: string
+          enum: [BUY, SELL]
+        confidence:
+          type: number
+        price:
+          type: number
+        rsi:
+          type: number
+        volatility:
+          type: number
+        reasons:
+          type: string
+        result:
+          type: string
+      required: [id, createdAt, symbol, side, confidence, price, rsi, volatility, reasons, result]
+    SignalxScanResponse:
+      type: object
+      properties:
+        accepted:
+          type: boolean
+        scanInProgress:
+          type: boolean
+        message:
+          type: string
+      required: [accepted, scanInProgress, message]
 
