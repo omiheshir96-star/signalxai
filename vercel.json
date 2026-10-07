@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm run build --prefix artifacts/signalx-ai",
+  "outputDirectory": "artifacts/signalx-ai/dist/public",
+  "installCommand": "npm install --prefix artifacts/signalx-ai",
+  "framework": "vite"
+}
