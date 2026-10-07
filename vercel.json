@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd artifacts/signalx-ai && npm run build",
-  "outputDirectory": "artifacts/signalx-ai/dist",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/public",
   "installCommand": "npm install",
   "framework": "vite"
 }
